@@ -5,6 +5,9 @@ PowerPoint版「マシュマロ・チャレンジ」を、ブラウザだけで�
 ## 機能
 
 - 参加者名の編集と3チームへのランダム振り分け
+- 5ページ構成の事前準備画面
+- チーム名・参加者・ゲーム時間のブラウザ保存
+- 設定ファイル（JSON）のダウンロードとインポート
 - 30秒、3分、18分のタイマー（終了音つき）
 - 備品・ルールの確認チェック
 - 各チームの高さ入力と順位の自動計算
@@ -32,4 +35,3 @@ python -m http.server 8000
 - Production branch: `main`
 
 リポジトリが一覧に出ない場合は、GitHubの **Settings → Applications → Installed GitHub Apps → Cloudflare Pages** を開き、Repository accessで `marshmallow-challenge-web` を許可してからCloudflare側で再読み込みします。
-

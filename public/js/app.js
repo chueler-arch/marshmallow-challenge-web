@@ -101,9 +101,10 @@
   function renderResults() {
     const ranked = state.teams.map((team, index) => ({ ...team, sourceIndex: index, score: Number(state.scores[index]) || 0 }))
       .sort((a, b) => b.score - a.score || a.sourceIndex - b.sourceIndex);
+    const topThree = ranked.slice(0, 3);
     $('#winnerName').textContent = ranked[0]?.name || 'NO TEAM';
-    $('#podium').classList.toggle('many-teams', ranked.length > 3);
-    $('#podium').innerHTML = ranked.map((team, index) => `
+    $('#podium').classList.remove('many-teams');
+    $('#podium').innerHTML = topThree.map((team, index) => `
       <article class="podium-step place-${index + 1}" style="--team-color:${teamColor(team.sourceIndex)}"><span>${index + 1} PLACE</span><b>${escapeHtml(team.name)}</b><strong>${formatScore(team.score)} cm</strong></article>`).join('');
     renderPrize(ranked);
   }
@@ -178,8 +179,6 @@
   function setupTimer(card) {
     card._timer = { total: Number(card.dataset.seconds), remaining: Number(card.dataset.seconds), running: false, interval: null, endAt: 0 };
     updateTimer(card);
-    $('[data-timer-action="toggle"]', card).addEventListener('click', () => toggleTimer(card));
-    $('[data-timer-action="reset"]', card).addEventListener('click', () => resetTimer(card));
   }
 
   function toggleTimer(card) {
@@ -188,9 +187,17 @@
     else {
       if (timer.remaining <= 0) timer.remaining = timer.total;
       timer.running = true; timer.endAt = Date.now() + timer.remaining * 1000;
-      timer.interval = setInterval(() => { timer.remaining = Math.max(0, Math.ceil((timer.endAt - Date.now()) / 1000)); updateTimer(card); if (timer.remaining === 0) finishTimer(card); }, 250);
+      timer.interval = window.setInterval(() => tickTimer(card), 200);
     }
     updateTimer(card);
+  }
+
+  function tickTimer(card) {
+    const timer = card._timer;
+    if (!timer?.running) return;
+    timer.remaining = Math.max(0, Math.ceil((timer.endAt - Date.now()) / 1000));
+    updateTimer(card);
+    if (timer.remaining === 0) finishTimer(card);
   }
 
   function resetTimer(card) {
@@ -350,6 +357,15 @@
   localStorage.removeItem('marshmallow-challenge-state-v2'); localStorage.removeItem('marshmallow-challenge-state-v3');
   applySettingsToApp(); syncMainFromState(); syncSetupFields();
   $('#participantInput').addEventListener('input', syncNames);
+  document.addEventListener('click', event => {
+    const control = event.target.closest('[data-timer-action]');
+    if (!control) return;
+    const card = control.closest('.timer-card');
+    if (!card?._timer) return;
+    event.preventDefault(); event.stopPropagation();
+    if (control.dataset.timerAction === 'toggle') toggleTimer(card);
+    if (control.dataset.timerAction === 'reset') resetTimer(card);
+  });
   $('#mainTeamCount').addEventListener('change', event => setTeamCount(event.target.value));
   $('#teams').addEventListener('click', event => {
     const button = event.target.closest('[data-edit-team-name]'); if (!button) return;

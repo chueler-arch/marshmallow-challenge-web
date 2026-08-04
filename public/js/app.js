@@ -238,10 +238,10 @@
   function openSetup(page = 0) { syncSetupFields(); showSetupPage(page); $('#setupOverlay').classList.add('is-open'); $('#setupOverlay').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
   function closeSetup() { saveSetupFields(); $('#setupOverlay').classList.remove('is-open'); $('#setupOverlay').setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; $('#setupBtn').focus(); }
   function showSetupPage(page) {
-    setupPage = Math.max(0, Math.min(4, page));
+    setupPage = Math.max(0, Math.min(6, page));
     $$('[data-setup-page]').forEach((button, index) => button.classList.toggle('is-active', index === setupPage));
     $$('[data-setup-panel]').forEach((panel, index) => panel.classList.toggle('is-active', index === setupPage));
-    $('#setupPrevBtn').disabled = setupPage === 0; $('.setup-footer').classList.toggle('is-last', setupPage === 4);
+    $('#setupPrevBtn').disabled = setupPage === 0; $('.setup-footer').classList.toggle('is-last', setupPage === 6);
     if (setupPage === 2) renderMaterialTeamTable();
   }
 
@@ -361,14 +361,26 @@
   localStorage.removeItem('marshmallow-challenge-state-v2'); localStorage.removeItem('marshmallow-challenge-state-v3');
   applySettingsToApp(); syncMainFromState(); syncSetupFields();
   $('#participantInput').addEventListener('input', syncNames);
-  document.addEventListener('click', event => {
-    const control = event.target.closest('[data-timer-action]');
-    if (!control) return;
+  function activateControl(control) {
+    if (control.matches('[data-restart]')) return restartExperience();
     const card = control.closest('.timer-card');
     if (!card?._timer) return;
-    event.preventDefault(); event.stopPropagation();
     if (control.dataset.timerAction === 'toggle') toggleTimer(card);
     if (control.dataset.timerAction === 'reset') resetTimer(card);
+  }
+  document.addEventListener('pointerdown', event => {
+    if (event.button !== 0) return;
+    const control = $$('[data-timer-action], [data-restart]').filter(button => button.closest('.slide')?.classList.contains('is-active')).find(button => {
+      const rect = button.getBoundingClientRect();
+      return rect.width > 0 && event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+    });
+    if (!control) return;
+    event.preventDefault(); event.stopImmediatePropagation(); activateControl(control);
+  }, true);
+  document.addEventListener('click', event => {
+    if (event.detail !== 0) return;
+    const control = event.target.closest('[data-timer-action], [data-restart]');
+    if (control) { event.preventDefault(); activateControl(control); }
   });
   $('#mainTeamCount').addEventListener('change', event => setTeamCount(event.target.value));
   $('#teams').addEventListener('click', event => {
@@ -390,7 +402,6 @@
   $('#prevBtn').addEventListener('click', () => goTo(current - 1)); $('#nextBtn').addEventListener('click', () => goTo(current + 1));
   $$('[data-next]').forEach(button => button.addEventListener('click', () => goTo(current + 1)));
   $('.brand').addEventListener('click', event => { event.preventDefault(); restartExperience(); });
-  document.addEventListener('click', event => { if (event.target.closest('[data-restart]')) { event.preventDefault(); event.stopPropagation(); restartExperience(); } });
   $('#soundBtn').addEventListener('click', () => { soundEnabled = !soundEnabled; state.settings.sound = soundEnabled; saveState(); $('#soundBtn').classList.toggle('is-muted', !soundEnabled); showToast(soundEnabled ? '効果音 ON' : '効果音 OFF'); });
   $('#setupBtn').addEventListener('click', () => openSetup()); $('#setupCloseBtn').addEventListener('click', closeSetup); $('#setupDoneBtn').addEventListener('click', () => { closeSetup(); showToast('事前準備を保存しました'); });
   $('#setupPrevBtn').addEventListener('click', () => showSetupPage(setupPage - 1)); $('#setupNextBtn').addEventListener('click', () => showSetupPage(setupPage + 1));

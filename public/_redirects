@@ -1,0 +1,3 @@
+/public / 301
+/public/ / 301
+/public/* /:splat 301

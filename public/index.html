@@ -150,7 +150,7 @@
     </main>
 
     <footer class="nav-bar">
-      <div class="footer-info"><nav aria-label="サイト情報"><a href="how-to-play.html">遊び方・ヘルプ</a><a href="about.html">このアプリについて</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a></nav><small>© SONA STUDIO</small></div>
+      <div class="footer-info"><nav aria-label="サイト情報"><a href="how-to-play.html">遊び方・ヘルプ</a><a href="about.html">このアプリについて</a><a href="terms.html">利用規約</a><a href="privacy.html">プライバシーポリシー</a><a href="https://sona-studio-portal.pages.dev/" target="_blank" rel="noopener">SONA STUDIO</a></nav><small>© SONA STUDIO</small></div>
       <div><button id="prevBtn" type="button" aria-label="前へ">←</button><button id="nextBtn" type="button" aria-label="次へ">次へ <span>→</span></button></div>
     </footer>
   </div>
@@ -218,6 +218,9 @@
     </div>
   </aside>
   <div class="toast" id="toast" role="status"></div>
+  <div class="timeup-overlay" id="timeupOverlay" role="alertdialog" aria-modal="true" aria-labelledby="timeupTitle" hidden>
+    <div class="timeup-dialog"><p>TIME'S UP</p><h2 id="timeupTitle">タイムアップ！</h2><span>作業を止めて、画面を確認してください。</span><button type="button" id="timeupCloseBtn">確認して閉じる</button></div>
+  </div>
   <script src="js/app.js"></script>
 </body>
 </html>

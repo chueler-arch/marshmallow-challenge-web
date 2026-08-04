@@ -218,7 +218,20 @@
     card.classList.toggle('is-running', timer.running);
   }
 
-  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showToast('タイムアップ！'); }
+  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showTimeUp(); }
+
+  function showTimeUp() {
+    const overlay = $('#timeupOverlay');
+    overlay.hidden = false;
+    requestAnimationFrame(() => overlay.classList.add('is-visible'));
+    $('#timeupCloseBtn').focus();
+  }
+
+  function closeTimeUp() {
+    const overlay = $('#timeupOverlay');
+    overlay.classList.remove('is-visible');
+    setTimeout(() => { overlay.hidden = true; }, 220);
+  }
 
   function playChime() {
     if (!soundEnabled) return;
@@ -394,6 +407,14 @@
   }
   document.addEventListener('pointerdown', event => {
     if (event.button !== 0) return;
+    const timerDisplay = $$('.timer-display').filter(display => display.closest('.slide')?.classList.contains('is-active')).find(display => {
+      const rect = display.getBoundingClientRect();
+      const padding = 18;
+      return rect.width > 0 && event.clientX >= rect.left - padding && event.clientX <= rect.right + padding && event.clientY >= rect.top - padding && event.clientY <= rect.bottom + padding;
+    });
+    if (timerDisplay) {
+      event.preventDefault(); event.stopImmediatePropagation(); beginTimerEdit(timerDisplay.closest('.timer-card')); return;
+    }
     const control = $$('[data-timer-action], [data-restart]').filter(button => button.closest('.slide')?.classList.contains('is-active')).find(button => {
       const rect = button.getBoundingClientRect();
       return rect.width > 0 && event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
@@ -410,6 +431,7 @@
     const display = event.target.closest('.timer-display');
     if (display) beginTimerEdit(display.closest('.timer-card'));
   });
+  $('#timeupCloseBtn').addEventListener('click', closeTimeUp);
   $('#mainTeamCount').addEventListener('change', event => setTeamCount(event.target.value));
   $('#teams').addEventListener('click', event => {
     const button = event.target.closest('[data-edit-team-name]'); if (!button) return;

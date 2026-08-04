@@ -155,7 +155,9 @@
   }
 
   function renderMaterialTeamTable() {
-    $('#materialTeamTable').innerHTML = state.teams.map(team => `<tr><th>${escapeHtml(team.name)}</th><td>20本</td><td>90cm</td><td>90cm</td><td>1つ</td><td>1つ</td></tr>`).join('');
+    const table = $('#materialTeamTable');
+    if (!table) return;
+    table.innerHTML = state.teams.map(team => `<tr><th>${escapeHtml(team.name)}</th><td>20本</td><td>90cm</td><td>90cm</td><td>1つ</td><td>1つ</td></tr>`).join('');
   }
 
   function syncMainFromState() {

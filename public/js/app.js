@@ -231,20 +231,67 @@
 
   function exportConfiguration() {
     saveSetupFields();
-    const payload = { type: 'marshmallow-challenge-config', version: 2, exportedAt: new Date().toISOString(), teams: state.teams, settings: state.settings };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' }); const url = URL.createObjectURL(blob); const link = document.createElement('a');
-    link.href = url; link.download = `marshmallow-challenge-config-${new Date().toISOString().slice(0, 10)}.json`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); showToast('設定ファイルをダウンロードしました');
+    const rows = [
+      ['type', 'index', 'key', 'value'],
+      ['meta', '', 'format', 'marshmallow-challenge-config'],
+      ['meta', '', 'version', '3'],
+      ['meta', '', 'exportedAt', new Date().toISOString()],
+      ...Object.entries(state.settings).map(([key, value]) => ['setting', '', key, String(value)]),
+      ...state.teams.flatMap((team, index) => [
+        ['team', String(index), 'name', team.name],
+        ...team.members.map(member => ['member', String(index), 'name', member])
+      ])
+    ];
+    const csv = `\uFEFF${rows.map(row => row.map(csvEscape).join(',')).join('\r\n')}`;
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a');
+    link.href = url; link.download = `marshmallow-challenge-config-${new Date().toISOString().slice(0, 10)}.csv`; link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); showToast('CSV設定ファイルをダウンロードしました');
   }
 
   async function importConfiguration(file) {
     try {
-      const payload = JSON.parse(await file.text());
-      if (payload?.type !== 'marshmallow-challenge-config' || typeof payload.settings !== 'object') throw new Error('invalid');
-      if (payload.version === 2 && Array.isArray(payload.teams)) state.teams = payload.teams.map((team, index) => ({ name: String(team?.name || `チーム${index + 1}`), members: Array.isArray(team?.members) ? team.members.map(String) : [] }));
-      else if (Array.isArray(payload.teamNames)) state.teams = payload.teamNames.map((name, index) => ({ name: String(name || `チーム${index + 1}`), members: Array.isArray(payload.teams?.[index]) ? payload.teams[index].map(String) : [] }));
-      else throw new Error('invalid');
-      state.settings = { ...DEFAULT_SETTINGS, ...payload.settings }; state.scores = state.teams.map(() => 0); normalizeState(); syncSetupFields(); saveSetupFields(); showToast('設定ファイルを読み込みました');
-    } catch { showToast('この設定ファイルは読み込めません'); }
+      const rows = parseCsv((await file.text()).replace(/^\uFEFF/, ''));
+      if (rows.length < 2 || rows[0].join(',') !== 'type,index,key,value') throw new Error('invalid-header');
+      const records = rows.slice(1);
+      if (!records.some(row => row[0] === 'meta' && row[2] === 'format' && row[3] === 'marshmallow-challenge-config')) throw new Error('invalid-format');
+      const importedTeams = [];
+      records.filter(row => row[0] === 'team').forEach(row => {
+        const index = Number(row[1]); if (!Number.isInteger(index) || index < 0) return;
+        importedTeams[index] = { name: row[3] || `チーム${index + 1}`, members: [] };
+      });
+      records.filter(row => row[0] === 'member').forEach(row => {
+        const index = Number(row[1]); if (importedTeams[index] && row[3]?.trim()) importedTeams[index].members.push(row[3].trim());
+      });
+      if (!importedTeams.length || importedTeams.some(team => !team)) throw new Error('invalid-teams');
+      const importedSettings = { ...DEFAULT_SETTINGS };
+      records.filter(row => row[0] === 'setting').forEach(row => {
+        const [,, key, value] = row;
+        if (!(key in DEFAULT_SETTINGS)) return;
+        importedSettings[key] = typeof DEFAULT_SETTINGS[key] === 'boolean' ? value === 'true' : typeof DEFAULT_SETTINGS[key] === 'number' ? Number(value) : value;
+      });
+      state.teams = importedTeams; state.settings = importedSettings; state.scores = state.teams.map(() => 0); normalizeState(); syncSetupFields(); saveSetupFields(); showToast('CSV設定ファイルを読み込みました');
+    } catch { showToast('このCSV設定ファイルは読み込めません'); }
+  }
+
+  function csvEscape(value) {
+    const text = String(value ?? '');
+    return /[",\r\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+  }
+
+  function parseCsv(text) {
+    const rows = []; let row = []; let field = ''; let quoted = false;
+    for (let index = 0; index < text.length; index++) {
+      const char = text[index];
+      if (quoted) {
+        if (char === '"' && text[index + 1] === '"') { field += '"'; index++; }
+        else if (char === '"') quoted = false;
+        else field += char;
+      } else if (char === '"') quoted = true;
+      else if (char === ',') { row.push(field); field = ''; }
+      else if (char === '\n') { row.push(field.replace(/\r$/, '')); rows.push(row); row = []; field = ''; }
+      else field += char;
+    }
+    if (field.length || row.length) { row.push(field.replace(/\r$/, '')); rows.push(row); }
+    return rows.filter(item => item.some(value => value !== ''));
   }
 
   localStorage.removeItem('marshmallow-challenge-state-v2'); localStorage.removeItem('marshmallow-challenge-state-v3');
@@ -274,7 +321,8 @@
   $('#addTeamBtn').addEventListener('click', () => { saveTeamRegistration(); const index = state.teams.length; state.teams.push({ name: `チーム${index + 1}`, members: [] }); state.scores.push(0); saveState(); syncSetupFields(); syncMainFromState(); });
   $('#setupShuffleBtn').addEventListener('click', () => { saveTeamRegistration(); const names = allNames(); if (names.length < state.teams.length) return showToast('参加者数がチーム数より少なくなっています'); distributeNames(names, true); saveState(); syncSetupFields(); syncMainFromState(); playChime(); showToast(`${state.teams.length}チームに再振り分けました`); });
   $$('.setup-page input').forEach(input => input.addEventListener('change', saveSetupFields));
-  $('#exportConfigBtn').addEventListener('click', exportConfiguration); $('#importConfigBtn').addEventListener('click', () => $('#importConfigInput').click());
+  $$('.export-config-btn').forEach(button => button.addEventListener('click', exportConfiguration));
+  $$('.import-config-btn').forEach(button => button.addEventListener('click', () => $('#importConfigInput').click()));
   $('#importConfigInput').addEventListener('change', event => { const [file] = event.target.files; if (file) importConfiguration(file); event.target.value = ''; });
   $('#setupOverlay').addEventListener('click', event => { if (event.target === $('#setupOverlay')) closeSetup(); });
   $('#fullscreenBtn').addEventListener('click', async () => { try { if (!document.fullscreenElement) await document.documentElement.requestFullscreen(); else await document.exitFullscreen(); } catch { showToast('全画面表示を利用できません'); } });

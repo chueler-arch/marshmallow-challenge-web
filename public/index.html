@@ -24,7 +24,6 @@
         <span id="slideCount">01 / 13</span>
       </div>
       <div class="top-actions">
-        <button class="setup-open-btn" id="setupBtn" type="button"><span>⚙</span> 事前準備</button>
         <button class="icon-btn" id="soundBtn" type="button" aria-label="効果音を切り替える" title="効果音"><span>♪</span></button>
         <button class="icon-btn" id="fullscreenBtn" type="button" aria-label="全画面表示" title="全画面表示"><span>⛶</span></button>
       </div>
@@ -36,12 +35,8 @@
           <p class="eyebrow"><span></span> TEAM BUILDING WORKSHOP</p>
           <h1>マシュマロ<br><em>チャレンジ</em></h1>
           <p class="lead">パスタとテープ、ひも、そしてマシュマロ。<br>18分で、いちばん高いタワーをつくろう。</p>
+          <button class="hero-setup-btn" id="setupBtn" type="button"><span>⚙</span> 事前準備をする</button>
           <button class="primary-btn" type="button" data-next>チャレンジをはじめる <span>→</span></button>
-        </div>
-        <div class="hero-art" aria-hidden="true">
-          <div class="sun"></div><div class="doodle d1">✦</div><div class="doodle d2">⌁</div>
-          <img class="hero-tower-image" src="images/Marshmallow_tower.png" alt="">
-          <span class="height-tag">Aim high!</span>
         </div>
       </section>
 
@@ -196,6 +191,7 @@
             <div class="team-registration-head"><span>チーム名</span><span>参加者（1行に1名）</span></div>
             <div class="team-registration" id="teamRegistration"></div>
             <div class="setup-inline-actions"><button class="add-team-btn" id="addTeamBtn" type="button">＋ チームを追加する</button><button class="setup-primary" id="setupShuffleBtn" type="button">全参加者を再振り分け</button><span id="setupParticipantCount">0名</span></div>
+            <div class="config-box"><div><b>チーム・参加者ファイル</b><p>設定はブラウザに自動保存されます。CSVファイルでバックアップや移動もできます。</p></div><div><button class="export-config-btn" type="button">↓ CSVダウンロード</button><button class="import-config-btn" type="button">↑ CSVインポート</button></div></div>
           </section>
           <section class="setup-page" data-setup-panel="4">
             <p class="setup-kicker">05 / GAME SETTINGS</p><h3>ゲームの設定</h3>
@@ -207,11 +203,12 @@
               <label>チーム発表<input id="settingPresentation" type="number" min="5" max="600"><span>秒</span></label>
               <label class="toggle-label">効果音を初期状態でON<input id="settingSound" type="checkbox"><i></i></label>
             </div>
-            <div class="config-box"><div><b>設定ファイル</b><p>チーム・参加者・ゲーム設定をJSONファイルで移動できます。</p></div><div><button id="exportConfigBtn" type="button">↓ ダウンロード</button><button id="importConfigBtn" type="button">↑ インポート</button><input id="importConfigInput" type="file" accept="application/json,.json" hidden></div></div>
+            <div class="config-box"><div><b>設定ファイル</b><p>設定はブラウザに自動保存されます。チーム・参加者・ゲーム設定をCSVファイルで移動できます。</p></div><div><button class="export-config-btn" type="button">↓ CSVダウンロード</button><button class="import-config-btn" type="button">↑ CSVインポート</button></div></div>
           </section>
         </div>
       </div>
       <footer class="setup-footer"><p>変更内容はこのブラウザに自動保存されます</p><div><button id="setupPrevBtn" type="button">← 戻る</button><button class="setup-primary" id="setupNextBtn" type="button">次へ →</button><button class="setup-primary setup-done" id="setupDoneBtn" type="button">準備完了</button></div></footer>
+      <input id="importConfigInput" type="file" accept="text/csv,.csv" hidden>
     </div>
   </aside>
   <div class="toast" id="toast" role="status"></div>

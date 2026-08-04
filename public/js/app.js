@@ -96,6 +96,13 @@
       state.scores[Number(input.dataset.score)] = Math.max(0, Number(input.value) || 0);
       saveState(); renderResults();
     }));
+    $$('.measure-card').forEach(card => {
+      card.tabIndex = 0;
+      card.setAttribute('role', 'group');
+      const focusInput = () => { const input = $('[data-score]', card); input.focus(); input.select(); };
+      card.addEventListener('click', event => { if (event.target.tagName !== 'INPUT') focusInput(); });
+      card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusInput(); } });
+    });
   }
 
   function renderResults() {
@@ -280,7 +287,7 @@
 
   function boundedNumber(value, min, max, fallback) { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback; }
   function applySettingsToApp() {
-    document.title = 'マシュマロ・チャレンジ';
+    document.title = window.i18n?.language === 'en' ? 'Marshmallow Challenge' : 'マシュマロ・チャレンジ';
     $('#preStartMessage').innerHTML = sanitizeDisplayHtml(state.settings.preStartText);
     $('#ruleBuildMinutes').textContent = `${state.settings.buildMinutes}分。`;
     $('#challengeDurationTitle').textContent = `${state.settings.buildMinutes}分間の`;

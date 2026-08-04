@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#fff8ec">
+  <meta name="description" content="マシュマロ・チャレンジのチーム分け、タイマー、計測、振り返りを一つにまとめた進行アプリ">
+  <title>マシュマロ・チャレンジ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Noto+Sans+JP:wght@500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="最初の画面へ">
+        <span class="brand-mark" aria-hidden="true"><span></span></span>
+        <span>Marshmallow<br><b>Challenge</b></span>
+      </a>
+      <div class="progress-wrap" aria-label="進行状況">
+        <span id="sectionLabel">START</span>
+        <div class="progress"><i id="progressBar"></i></div>
+        <span id="slideCount">01 / 13</span>
+      </div>
+      <div class="top-actions">
+        <button class="setup-open-btn" id="setupBtn" type="button"><span>⚙</span> 事前準備</button>
+        <button class="icon-btn" id="soundBtn" type="button" aria-label="効果音を切り替える" title="効果音"><span>♪</span></button>
+        <button class="icon-btn" id="fullscreenBtn" type="button" aria-label="全画面表示" title="全画面表示"><span>⛶</span></button>
+      </div>
+    </header>
+
+    <main id="stage" tabindex="-1" aria-live="polite">
+      <section class="slide hero is-active" data-title="START">
+        <div class="hero-copy">
+          <p class="eyebrow"><span></span> TEAM BUILDING WORKSHOP</p>
+          <h1>マシュマロ<br><em>チャレンジ</em></h1>
+          <p class="lead">パスタとテープ、ひも、そしてマシュマロ。<br>18分で、いちばん高いタワーをつくろう。</p>
+          <button class="primary-btn" type="button" data-next>チャレンジをはじめる <span>→</span></button>
+        </div>
+        <div class="hero-art" aria-hidden="true">
+          <div class="sun"></div><div class="doodle d1">✦</div><div class="doodle d2">⌁</div>
+          <img class="hero-tower-image" src="images/Marshmallow_tower.png" alt="">
+          <span class="height-tag">Aim high!</span>
+        </div>
+      </section>
+
+      <section class="slide center-slide" data-title="INTRO">
+        <div class="mini-marshmallow" aria-hidden="true"></div>
+        <p class="eyebrow centered"><span></span> FIRST THINGS FIRST <span></span></p>
+        <h2>この時間だけは、<br><em>画面を閉じよう。</em></h2>
+        <p class="big-note">ここから終了まで、PC・スマートフォンは使用しません。</p>
+        <div class="ban-row"><div>PC</div><b>×</b><div>PHONE</div><b>×</b><div>SEARCH</div></div>
+      </section>
+
+      <section class="slide" data-title="TEAM MAKING">
+        <div class="slide-heading">
+          <div><p class="eyebrow"><span></span> TEAM MAKING</p><h2>チームを<br><em>つくろう。</em></h2></div>
+          <p>登録済みの参加者を、設定したチーム数でランダムに振り分けます。</p>
+        </div>
+        <div class="team-workspace">
+          <div class="participant-panel">
+            <label for="participantInput">参加者 <small id="participantCount">12名</small></label>
+            <textarea id="participantInput" rows="8" spellcheck="false"></textarea>
+            <button class="shuffle-btn" id="shuffleBtn" type="button"><span>↻</span> ランダムにチーム分け</button>
+          </div>
+          <div class="teams" id="teams" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="PRESENTER">
+        <div class="split-layout">
+          <div><p class="eyebrow"><span></span> CHOOSE A PRESENTER</p><h2>発表者を<br><em>決めよう。</em></h2><p class="lead">最後に各チーム30秒で発表します。<br>チームの代表者を、いま決めてください。</p></div>
+          <div class="timer-card" data-seconds="30">
+            <p>COUNTDOWN</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">00:30</strong></div>
+            <div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="CHECKLIST">
+        <div class="slide-heading"><div><p class="eyebrow"><span></span> CHECKLIST</p><h2>備品を<br><em>確認しよう。</em></h2></div><p>すべて揃っているか、チームごとにチェックしてください。</p></div>
+        <div class="supply-grid" id="supplyGrid">
+          <button type="button"><span>01</span><b>乾燥パスタ</b><strong>20<small>本</small></strong><i>✓</i></button>
+          <button type="button"><span>02</span><b>テープ</b><strong>90<small>cm</small></strong><i>✓</i></button>
+          <button type="button"><span>03</span><b>ひも</b><strong>90<small>cm</small></strong><i>✓</i></button>
+          <button type="button"><span>04</span><b>マシュマロ</b><strong>1<small>つ</small></strong><i>✓</i></button>
+          <button type="button"><span>05</span><b>はさみ</b><strong>1<small>つ</small></strong><i>✓</i></button>
+        </div>
+      </section>
+
+      <section class="slide" data-title="RULES">
+        <div class="rules-title"><p class="eyebrow"><span></span> THE RULES</p><h2>ルールは、<em>7つ。</em></h2><p>カードをクリックすると、説明済みにできます。</p></div>
+        <div class="rule-grid" id="ruleGrid">
+          <button type="button"><span>01</span><b>できるだけ高く</b><p>自立可能なタワーを立てる</p></button>
+          <button type="button"><span>02</span><b>頂上に置く</b><p>マシュマロはパスタに刺してもOK</p></button>
+          <button class="warning" type="button"><span>03</span><b>足場は固定しない</b><p>テープで机に貼り付けるのは禁止</p></button>
+          <button type="button"><span>04</span><b>加工してOK</b><p>パスタ・テープ・ひもは切って貼れる</p></button>
+          <button class="warning" type="button"><span>05</span><b>マシュマロは切らない</b><p>ひとつのまま使用する</p></button>
+          <button type="button"><span>06</span><b>計測中も自立</b><p>手を離した状態で高さを測る</p></button>
+          <button type="button"><span>07</span><b>制限時間は18分</b><p>作戦タイムも時間に含む</p></button>
+        </div>
+      </section>
+
+      <section class="slide challenge-slide" data-title="BUILD">
+        <div class="challenge-copy"><p class="eyebrow light"><span></span> READY TO BUILD?</p><h2>18分間の<br><em>チャレンジ。</em></h2><p>使ってよいのは、確認した5つの備品だけ。<br>準備ができたらタイマーをスタート！</p></div>
+        <div class="timer-card timer-card--dark" data-seconds="1080">
+          <p>TIME REMAINING</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">18:00</strong></div>
+          <div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="MEASURE">
+        <div class="slide-heading"><div><p class="eyebrow"><span></span> MEASUREMENT</p><h2>高さを<br><em>計測しよう。</em></h2></div><p>タワーから手を離し、マシュマロの最上部までの高さを入力してください。</p></div>
+        <div class="measure-grid" id="measureGrid"></div>
+        <button class="primary-btn results-btn" type="button" data-next>順位を見る <span>→</span></button>
+      </section>
+
+      <section class="slide results-slide" data-title="RESULTS">
+        <div class="confetti" aria-hidden="true"></div>
+        <p class="eyebrow centered"><span></span> FINAL RESULTS <span></span></p>
+        <h2><span id="winnerName">A TEAM</span><br><em>おめでとう！</em></h2>
+        <div class="podium" id="podium"></div>
+      </section>
+
+      <section class="slide" data-title="REFLECTION">
+        <div class="split-layout reflection-layout">
+          <div><p class="eyebrow"><span></span> REFLECTION</p><h2>つくった後が、<br><em>いちばん大事。</em></h2><div class="questions"><p><span>01</span>なぜ、この順位・高さになった？</p><p><span>02</span>どうすれば1位になれた？</p><p><span>03</span>次の挑戦で変えることは？</p></div></div>
+          <div class="timer-card" data-seconds="180">
+            <p>TEAM TALK</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">03:00</strong></div>
+            <div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="slide" data-title="PRESENTATION">
+        <div class="presentation-head"><div><p class="eyebrow"><span></span> PRESENTATION</p><h2>30秒で、<em>発表。</em></h2></div><div class="team-tabs" id="teamTabs"></div></div>
+        <div class="presentation-body"><div><span id="presentingBadge">TEAM A</span><h3 id="presentingTeam">Aチームの発表</h3><p>気づいたこと、工夫したこと、次に変えたいことを共有してください。</p></div>
+          <div class="timer-card compact" data-seconds="30"><p>PRESENTATION TIME</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">00:30</strong></div><div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div></div>
+        </div>
+      </section>
+
+      <section class="slide prize-slide" data-title="PRIZE">
+        <div class="prize-art" aria-hidden="true"><div class="gift"><i></i></div><span class="spark sp1">✦</span><span class="spark sp2">✦</span><span class="spark sp3">●</span></div>
+        <div><p class="eyebrow"><span></span> AWARD TIME</p><h2>健闘をたたえて、<br><em>景品授与。</em></h2><ol><li><b>1位</b> ギフト券1枚ずつ ＋ 豪華景品</li><li><b>2位</b> 残った景品から、ひとり1つ</li><li><b>3位</b> 景品が余っていたら、ひとり1つ</li></ol></div>
+      </section>
+
+      <section class="slide end-slide" data-title="FINISH">
+        <div class="end-art" aria-hidden="true"><img src="images/Marshmallow.png" alt=""><span>✦</span></div>
+        <p class="eyebrow centered"><span></span> GREAT WORK <span></span></p>
+        <h2>おつかれさまでした！</h2>
+        <p>小さくつくって、試して、学ぶ。<br>今日の発見を、次のチャレンジへ。</p>
+        <button class="secondary-btn" id="restartBtn" type="button">最初に戻る ↺</button>
+      </section>
+    </main>
+
+    <footer class="nav-bar">
+      <p><kbd>←</kbd><kbd>→</kbd> キーでも操作できます</p>
+      <div><button id="prevBtn" type="button" aria-label="前へ">←</button><button id="nextBtn" type="button" aria-label="次へ">次へ <span>→</span></button></div>
+    </footer>
+  </div>
+  <aside class="setup-overlay" id="setupOverlay" aria-hidden="true">
+    <div class="setup-panel" role="dialog" aria-modal="true" aria-labelledby="setupTitle">
+      <header class="setup-header">
+        <div><p>BEFORE THE WORKSHOP</p><h2 id="setupTitle">事前準備</h2></div>
+        <button class="setup-close" id="setupCloseBtn" type="button" aria-label="事前準備を閉じる">×</button>
+      </header>
+      <div class="setup-body">
+        <nav class="setup-nav" aria-label="事前準備メニュー">
+          <button class="is-active" type="button" data-setup-page="0"><span>01</span>ゲームの目的</button>
+          <button type="button" data-setup-page="1"><span>02</span>ルールと進行</button>
+          <button type="button" data-setup-page="2"><span>03</span>用意する物</button>
+          <button type="button" data-setup-page="3"><span>04</span>チーム・参加者</button>
+          <button type="button" data-setup-page="4"><span>05</span>ゲームの設定</button>
+        </nav>
+        <div class="setup-content">
+          <section class="setup-page is-active" data-setup-panel="0">
+            <p class="setup-kicker">01 / PURPOSE</p><h3>ゲームの目的</h3>
+            <p class="setup-lead">限られた材料と時間の中で、チームで試行錯誤しながら、できるだけ高い自立式タワーをつくります。</p>
+            <div class="purpose-grid"><article><b>協働</b><p>役割を決め、アイデアを共有しながら一つの成果をつくる。</p></article><article><b>試行錯誤</b><p>小さく試し、失敗から学び、制限時間内に改善する。</p></article><article><b>振り返り</b><p>結果だけでなく、チームの進め方と意思決定から学ぶ。</p></article></div>
+          </section>
+          <section class="setup-page" data-setup-panel="1">
+            <p class="setup-kicker">02 / RULES & FLOW</p><h3>ルール説明と進行方法</h3>
+            <div class="flow-list"><article><span>01</span><div><b>導入・チーム分け</b><p>目的を伝え、登録したチームで活動を始めます。</p></div></article><article><span>02</span><div><b>発表者決め・備品確認</b><p>30秒で代表者を決め、5種類の備品を確認します。</p></div></article><article><span>03</span><div><b>ルール説明</b><p>7つのルールを全員で確認します。</p></div></article><article><span>04</span><div><b>制作</b><p>作戦タイムを含め、設定した時間でタワーを制作します。</p></div></article><article><span>05</span><div><b>計測・振り返り・発表</b><p>高さを記録し、チームで振り返った後に発表します。</p></div></article></div>
+          </section>
+          <section class="setup-page" data-setup-panel="2">
+            <p class="setup-kicker">03 / MATERIALS</p><h3>用意する物</h3>
+            <p class="setup-lead">下記は1チーム分です。参加チーム数に合わせて準備してください。</p>
+            <div class="material-table"><div><b>乾燥パスタ</b><strong>20本</strong></div><div><b>テープ</b><strong>90cm</strong></div><div><b>ひも</b><strong>90cm</strong></div><div><b>マシュマロ</b><strong>1つ</strong></div><div><b>はさみ</b><strong>1つ</strong></div></div>
+            <div class="team-materials"><h4>チームごとの準備数</h4><div class="team-materials-scroll"><table><thead><tr><th>チーム</th><th>パスタ</th><th>テープ</th><th>ひも</th><th>マシュマロ</th><th>はさみ</th></tr></thead><tbody id="materialTeamTable"></tbody></table></div></div>
+            <p class="setup-tip">運営用として、メジャー・記録用紙・景品も準備しておくとスムーズです。</p>
+          </section>
+          <section class="setup-page" data-setup-panel="3">
+            <p class="setup-kicker">04 / TEAMS & MEMBERS</p><h3>チームと参加者の登録</h3>
+            <p class="team-guidance">1チーム3～5名を基本としてください。</p>
+            <div class="team-registration-head"><span>チーム名</span><span>参加者（1行に1名）</span></div>
+            <div class="team-registration" id="teamRegistration"></div>
+            <div class="setup-inline-actions"><button class="add-team-btn" id="addTeamBtn" type="button">＋ チームを追加する</button><button class="setup-primary" id="setupShuffleBtn" type="button">全参加者を再振り分け</button><span id="setupParticipantCount">0名</span></div>
+          </section>
+          <section class="setup-page" data-setup-panel="4">
+            <p class="setup-kicker">05 / GAME SETTINGS</p><h3>ゲームの設定</h3>
+            <div class="settings-grid">
+              <label>ゲーム名<input id="settingTitle" type="text" maxlength="40"></label>
+              <label>発表者決め<input id="settingPresenter" type="number" min="5" max="600"><span>秒</span></label>
+              <label>制作時間<input id="settingBuild" type="number" min="1" max="120"><span>分</span></label>
+              <label>振り返り<input id="settingReflection" type="number" min="1" max="60"><span>分</span></label>
+              <label>チーム発表<input id="settingPresentation" type="number" min="5" max="600"><span>秒</span></label>
+              <label class="toggle-label">効果音を初期状態でON<input id="settingSound" type="checkbox"><i></i></label>
+            </div>
+            <div class="config-box"><div><b>設定ファイル</b><p>チーム・参加者・ゲーム設定をJSONファイルで移動できます。</p></div><div><button id="exportConfigBtn" type="button">↓ ダウンロード</button><button id="importConfigBtn" type="button">↑ インポート</button><input id="importConfigInput" type="file" accept="application/json,.json" hidden></div></div>
+          </section>
+        </div>
+      </div>
+      <footer class="setup-footer"><p>変更内容はこのブラウザに自動保存されます</p><div><button id="setupPrevBtn" type="button">← 戻る</button><button class="setup-primary" id="setupNextBtn" type="button">次へ →</button><button class="setup-primary setup-done" id="setupDoneBtn" type="button">準備完了</button></div></footer>
+    </div>
+  </aside>
+  <div class="toast" id="toast" role="status"></div>
+  <script src="js/app.js"></script>
+</body>
+</html>

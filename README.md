@@ -4,7 +4,8 @@ PowerPoint版「マシュマロ・チャレンジ」を、ブラウザだけで�
 
 ## 機能
 
-- 参加者名の編集と3チームへのランダム振り分け
+- 任意の数のチーム登録・追加・削除
+- チーム別の参加者登録とランダム再振り分け
 - 5ページ構成の事前準備画面
 - チーム名・参加者・ゲーム時間のブラウザ保存
 - 設定ファイル（JSON）のダウンロードとインポート
@@ -17,10 +18,10 @@ PowerPoint版「マシュマロ・チャレンジ」を、ブラウザだけで�
 
 ## ローカルで確認
 
-`index.html` をブラウザで開くだけで動作します。ローカルサーバーを使う場合は次のコマンドを実行します。
+公開ファイルは `public` にまとめています。ローカルサーバーを使う場合は次のコマンドを実行します。
 
 ```powershell
-python -m http.server 8000
+python -m http.server 8000 --directory public
 ```
 
 その後、`http://localhost:8000` を開きます。
@@ -31,7 +32,7 @@ python -m http.server 8000
 
 - Framework preset: `None`
 - Build command: 空欄
-- Build output directory: `/`（または空欄）
+- Build output directory: `public`
 - Production branch: `main`
 
 リポジトリが一覧に出ない場合は、GitHubの **Settings → Applications → Installed GitHub Apps → Cloudflare Pages** を開き、Repository accessで `marshmallow-challenge-web` を許可してからCloudflare側で再読み込みします。

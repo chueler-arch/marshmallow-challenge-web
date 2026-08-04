@@ -105,7 +105,9 @@
     $('#winnerName').textContent = ranked[0]?.name || 'NO TEAM';
     $('#podium').classList.remove('many-teams');
     $('#podium').innerHTML = topThree.map((team, index) => `
-      <article class="podium-step place-${index + 1}" style="--team-color:${teamColor(team.sourceIndex)}"><span>${index + 1} PLACE</span><b>${escapeHtml(team.name)}</b><strong>${formatScore(team.score)} cm</strong></article>`).join('');
+      <article class="podium-step place-${index + 1}" style="--team-color:${teamColor(team.sourceIndex)}">
+        <i class="podium-medal" aria-hidden="true">${['★', '◆', '●'][index]}</i><span>${index + 1} PLACE</span><b>${escapeHtml(team.name)}</b><strong>${formatScore(team.score)} cm</strong><em>${index + 1}</em>
+      </article>`).join('');
     renderPrize(ranked);
   }
 
@@ -385,7 +387,8 @@
   $('#supplyGrid').addEventListener('click', event => event.target.closest('button')?.classList.toggle('is-checked'));
   $('#prevBtn').addEventListener('click', () => goTo(current - 1)); $('#nextBtn').addEventListener('click', () => goTo(current + 1));
   $$('[data-next]').forEach(button => button.addEventListener('click', () => goTo(current + 1)));
-  $('.brand').addEventListener('click', event => { event.preventDefault(); restartExperience(); }); $('#restartBtn').addEventListener('click', restartExperience);
+  $('.brand').addEventListener('click', event => { event.preventDefault(); restartExperience(); });
+  document.addEventListener('click', event => { if (event.target.closest('[data-restart]')) { event.preventDefault(); event.stopPropagation(); restartExperience(); } });
   $('#soundBtn').addEventListener('click', () => { soundEnabled = !soundEnabled; state.settings.sound = soundEnabled; saveState(); $('#soundBtn').classList.toggle('is-muted', !soundEnabled); showToast(soundEnabled ? '効果音 ON' : '効果音 OFF'); });
   $('#setupBtn').addEventListener('click', () => openSetup()); $('#setupCloseBtn').addEventListener('click', closeSetup); $('#setupDoneBtn').addEventListener('click', () => { closeSetup(); showToast('事前準備を保存しました'); });
   $('#setupPrevBtn').addEventListener('click', () => showSetupPage(setupPage - 1)); $('#setupNextBtn').addEventListener('click', () => showSetupPage(setupPage + 1));

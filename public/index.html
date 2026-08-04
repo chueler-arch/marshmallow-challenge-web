@@ -53,8 +53,8 @@
 
       <section class="slide" data-title="TEAM MAKING">
         <div class="slide-heading">
-          <div><p class="eyebrow"><span></span> TEAM MAKING</p><h2>チームを<br><em>つくろう。</em></h2></div>
-          <p>登録済みの参加者を、設定したチーム数でランダムに振り分けます。</p>
+          <div><p class="eyebrow"><span></span> TEAM ASSIGNMENT</p><h2>チーム<em>分け</em></h2></div>
+          <p class="move-instruction">自分の名前を確認して、<br><strong>チームの机に移動してください。</strong></p>
         </div>
         <div class="team-workspace">
           <div class="participant-panel">
@@ -84,21 +84,17 @@
           <button type="button"><span>03</span><b>ひも</b><strong>90<small>cm</small></strong><i>✓</i></button>
           <button type="button"><span>04</span><b>マシュマロ</b><strong>1<small>つ</small></strong><i>✓</i></button>
           <button type="button"><span>05</span><b>はさみ</b><strong>1<small>つ</small></strong><i>✓</i></button>
+          <button class="shared-supply" type="button"><span>会場共通</span><b>大型モニタ または<br>プロジェクター</b><strong>1<small>台</small></strong><i>✓</i></button>
         </div>
       </section>
 
-      <section class="slide" data-title="RULES">
-        <div class="rules-title"><p class="eyebrow"><span></span> THE RULES</p><h2>ルールは、<em>7つ。</em></h2><p>カードをクリックすると、説明済みにできます。</p></div>
-        <div class="rule-grid" id="ruleGrid">
-          <button type="button"><img src="images/explanation01.png" alt=""><span>01</span><b>できるだけ高く</b><p>自立可能なタワーを立てる</p></button>
-          <button type="button"><img src="images/explanation02.png" alt=""><span>02</span><b>頂上に置く</b><p>マシュマロはパスタに刺してもOK</p></button>
-          <button class="warning" type="button"><img src="images/explanation03.png" alt=""><span>03</span><b>足場は固定しない</b><p>テープで机に貼り付けるのは禁止</p></button>
-          <button type="button"><img src="images/explanation04.png" alt=""><span>04</span><b>加工してOK</b><p>パスタ・テープ・ひもは切って貼れる</p></button>
-          <button class="warning" type="button"><img src="images/explanation05.png" alt=""><span>05</span><b>マシュマロは切らない</b><p>ひとつのまま使用する</p></button>
-          <button type="button"><img src="images/explanation06.png" alt=""><span>06</span><b>計測中も自立</b><p>手を離した状態で高さを測る</p></button>
-          <button type="button"><img src="images/explanation07.png" alt=""><span>07</span><b>制限時間は18分</b><p>作戦タイムも時間に含む</p></button>
-        </div>
-      </section>
+      <section class="slide rule-detail" data-title="RULE 01"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 01 / 07</p><h2>できるだけ、<br><em>高く。</em></h2><p>自立可能なタワーを立ててください。</p></div><img src="images/explanation01.png" alt="高い自立式タワーの説明"></section>
+      <section class="slide rule-detail" data-title="RULE 02"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 02 / 07</p><h2>頂上に、<br><em>マシュマロ。</em></h2><p>タワーの上にマシュマロを置きます。パスタに刺してもOKです。</p></div><img src="images/explanation02.png" alt="頂上のマシュマロの説明"></section>
+      <section class="slide rule-detail rule-detail--warning" data-title="RULE 03"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 03 / 07</p><h2>足場は、<br><em>固定しない。</em></h2><p>テープでタワーを机に貼り付けてはいけません。</p></div><img src="images/explanation03.png" alt="足場を固定しない説明"></section>
+      <section class="slide rule-detail" data-title="RULE 04"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 04 / 07</p><h2>材料の加工は、<br><em>OK。</em></h2><p>パスタ、テープ、ひもは、切ったり貼ったりできます。</p></div><img src="images/explanation04.png" alt="材料を加工できる説明"></section>
+      <section class="slide rule-detail rule-detail--warning" data-title="RULE 05"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 05 / 07</p><h2>マシュマロは、<br><em>切らない。</em></h2><p>マシュマロは、ひとつのまま使用してください。</p></div><img src="images/explanation05.png" alt="マシュマロを切らない説明"></section>
+      <section class="slide rule-detail rule-detail--warning" data-title="RULE 06"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 06 / 07</p><h2>計測中も、<br><em>自立。</em></h2><p>手を離した状態でタワーが立っていなければなりません。</p></div><img src="images/explanation06.png" alt="計測中も自立させる説明"></section>
+      <section class="slide rule-detail" data-title="RULE 07"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 07 / 07</p><h2>制限時間は、<br><em id="ruleBuildMinutes">18分。</em></h2><p>作戦タイムも制限時間に含まれます。</p></div><img src="images/explanation07.png" alt="制限時間の説明"></section>
 
       <section class="slide challenge-slide" data-title="BUILD">
         <div class="challenge-copy"><p class="eyebrow light"><span></span> READY TO BUILD?</p><h2>18分間の<br><em>チャレンジ。</em></h2><p>使ってよいのは、確認した5つの備品だけ。<br>準備ができたらタイマーをスタート！</p></div>
@@ -185,6 +181,7 @@
             <p class="setup-kicker">03 / MATERIALS</p><h3>用意する物</h3>
             <p class="setup-lead">下記は1チーム分です。参加チーム数に合わせて準備してください。</p>
             <div class="material-table"><div><b>乾燥パスタ</b><strong>20本</strong></div><div><b>テープ</b><strong>90cm</strong></div><div><b>ひも</b><strong>90cm</strong></div><div><b>マシュマロ</b><strong>1つ</strong></div><div><b>はさみ</b><strong>1つ</strong></div></div>
+            <div class="venue-prep"><h4>会場共通で用意する物</h4><div><article><b>大型モニタ または プロジェクター</b><p>このアプリの画面を、参加者全員が見られるように表示します。</p></article><article><b>チーム名の表示</b><p>チーム分け後すぐ移動できるよう、各机にチーム名が分かる表示を置いてください。</p></article></div></div>
             <div class="team-materials"><h4>チームごとの準備数</h4><div class="team-materials-scroll"><table><thead><tr><th>チーム</th><th>パスタ</th><th>テープ</th><th>ひも</th><th>マシュマロ</th><th>はさみ</th></tr></thead><tbody id="materialTeamTable"></tbody></table></div></div>
             <p class="setup-tip">運営用として、メジャー・記録用紙・景品も準備しておくとスムーズです。</p>
           </section>

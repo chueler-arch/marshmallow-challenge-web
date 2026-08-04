@@ -246,6 +246,7 @@
   function applySettingsToApp() {
     document.title = 'マシュマロ・チャレンジ';
     $('#preStartMessage').textContent = state.settings.preStartText;
+    $('#ruleBuildMinutes').textContent = `${state.settings.buildMinutes}分。`;
     refreshSlides();
     const durations = [state.settings.presenterSeconds, state.settings.buildMinutes * 60, state.settings.reflectionMinutes * 60, state.settings.presentationSeconds];
     $$('.timer-card').forEach((card, index) => { card.dataset.seconds = String(durations[index]); if (card._timer) { clearInterval(card._timer.interval); card._timer = { total: durations[index], remaining: durations[index], running: false, interval: null, endAt: 0 }; updateTimer(card); } });
@@ -326,7 +327,6 @@
     setTimeout(() => { syncMainFromState(); syncSetupFields(); saveState(); button.classList.remove('is-spinning'); playChime(); showToast(`${state.teams.length}チームに振り分けました`); }, 550);
   });
   $('#supplyGrid').addEventListener('click', event => event.target.closest('button')?.classList.toggle('is-checked'));
-  $('#ruleGrid').addEventListener('click', event => event.target.closest('button')?.classList.toggle('is-seen'));
   $('#prevBtn').addEventListener('click', () => goTo(current - 1)); $('#nextBtn').addEventListener('click', () => goTo(current + 1));
   $$('[data-next]').forEach(button => button.addEventListener('click', () => goTo(current + 1)));
   $('.brand').addEventListener('click', event => { event.preventDefault(); goTo(0); }); $('#restartBtn').addEventListener('click', () => goTo(0));

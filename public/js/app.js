@@ -1,11 +1,11 @@
 (() => {
   'use strict';
 
-  const DEFAULT_SETTINGS = { title: 'マシュマロ・チャレンジ', presenterSeconds: 30, buildMinutes: 18, reflectionMinutes: 3, presentationSeconds: 30, sound: true };
+  const DEFAULT_SETTINGS = { presenterSeconds: 30, buildMinutes: 18, reflectionMinutes: 3, presentationSeconds: 30, sound: true, preStartEnabled: false, preStartText: 'みなさんにチャレンジ頂くのは・・・', prize1: '', prize2: '', prize3: '' };
   const TEAM_COLORS = ['#f36f32', '#2c7657', '#3197b9', '#8b5fbf', '#d94865', '#348a89', '#cf8a24', '#5968b0', '#7b8d42', '#b45b8c'];
   const STORAGE_KEY = 'marshmallow-challenge-state-v4';
-  const slides = [...document.querySelectorAll('.slide')];
   const state = loadState();
+  let slides = [];
   let current = 0;
   let soundEnabled = state.settings.sound;
   let setupPage = 0;
@@ -35,6 +35,13 @@
   }
 
   function saveState() { normalizeState(); localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+  function refreshSlides() {
+    const active = $('.slide.is-active');
+    slides = $$('.slide').filter(slide => slide.dataset.optional !== 'prestart' || state.settings.preStartEnabled);
+    $$('.slide[data-optional="prestart"]').forEach(slide => slide.classList.toggle('is-disabled-slide', !state.settings.preStartEnabled));
+    if (active && slides.includes(active)) current = slides.indexOf(active);
+  }
 
   function distributeNames(names, shuffle = false) {
     const items = shuffle ? shuffled(names) : [...names];
@@ -87,6 +94,15 @@
     $('#podium').classList.toggle('many-teams', ranked.length > 3);
     $('#podium').innerHTML = ranked.map((team, index) => `
       <article class="podium-step place-${index + 1}" style="--team-color:${teamColor(team.sourceIndex)}"><span>${index + 1} PLACE</span><b>${escapeHtml(team.name)}</b><strong>${formatScore(team.score)} cm</strong></article>`).join('');
+    renderPrize(ranked);
+  }
+
+  function renderPrize(ranked) {
+    const prizes = [state.settings.prize1, state.settings.prize2, state.settings.prize3];
+    const hasPrizes = prizes.some(prize => prize?.trim());
+    const winner = ranked[0]?.name || '優勝チーム';
+    $('#prizeTitle').innerHTML = hasPrizes ? '健闘をたたえて、<br><em>景品授与。</em>' : `健闘をたたえて、<br><em>${escapeHtml(winner)}に拍手！</em>`;
+    $('#prizeList').innerHTML = [0, 1, 2].filter(index => ranked[index]).map(index => `<li><b>${index + 1}位 ${escapeHtml(ranked[index].name)}</b>${hasPrizes ? escapeHtml(prizes[index]?.trim() || '景品なし') : ''}</li>`).join('');
   }
 
   function renderPresentationTabs() {
@@ -144,6 +160,7 @@
     $('#progressBar').style.width = `${((current + 1) / slides.length) * 100}%`;
     $('#prevBtn').disabled = current === 0; $('#nextBtn').disabled = current === slides.length - 1;
     $('#nextBtn').innerHTML = current === slides.length - 2 ? '終了へ <span>→</span>' : '次へ <span>→</span>';
+    document.body.classList.toggle('prestart-active', slides[current].dataset.optional === 'prestart');
     $('#stage').focus({ preventScroll: true });
   }
 
@@ -208,23 +225,28 @@
 
   function syncSetupFields() {
     renderTeamRegistration(); renderMaterialTeamTable();
-    $('#settingTitle').value = state.settings.title; $('#settingPresenter').value = state.settings.presenterSeconds; $('#settingBuild').value = state.settings.buildMinutes;
+    $('#settingPresenter').value = state.settings.presenterSeconds; $('#settingBuild').value = state.settings.buildMinutes;
     $('#settingReflection').value = state.settings.reflectionMinutes; $('#settingPresentation').value = state.settings.presentationSeconds; $('#settingSound').checked = state.settings.sound;
+    $('#settingPreStart').checked = state.settings.preStartEnabled; $('#settingPreStartText').value = state.settings.preStartText;
+    $('#settingPrize1').value = state.settings.prize1; $('#settingPrize2').value = state.settings.prize2; $('#settingPrize3').value = state.settings.prize3;
   }
 
   function saveSetupFields() {
     saveTeamRegistration();
     state.settings = {
-      title: $('#settingTitle').value.trim() || DEFAULT_SETTINGS.title,
       presenterSeconds: boundedNumber($('#settingPresenter').value, 5, 600, 30), buildMinutes: boundedNumber($('#settingBuild').value, 1, 120, 18),
-      reflectionMinutes: boundedNumber($('#settingReflection').value, 1, 60, 3), presentationSeconds: boundedNumber($('#settingPresentation').value, 5, 600, 30), sound: $('#settingSound').checked
+      reflectionMinutes: boundedNumber($('#settingReflection').value, 1, 60, 3), presentationSeconds: boundedNumber($('#settingPresentation').value, 5, 600, 30), sound: $('#settingSound').checked,
+      preStartEnabled: $('#settingPreStart').checked, preStartText: $('#settingPreStartText').value.trim() || DEFAULT_SETTINGS.preStartText,
+      prize1: $('#settingPrize1').value.trim(), prize2: $('#settingPrize2').value.trim(), prize3: $('#settingPrize3').value.trim()
     };
-    soundEnabled = state.settings.sound; $('#soundBtn').classList.toggle('is-muted', !soundEnabled); saveState(); applySettingsToApp();
+    soundEnabled = state.settings.sound; $('#soundBtn').classList.toggle('is-muted', !soundEnabled); saveState(); applySettingsToApp(); renderResults();
   }
 
   function boundedNumber(value, min, max, fallback) { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback; }
   function applySettingsToApp() {
-    document.title = state.settings.title;
+    document.title = 'マシュマロ・チャレンジ';
+    $('#preStartMessage').textContent = state.settings.preStartText;
+    refreshSlides();
     const durations = [state.settings.presenterSeconds, state.settings.buildMinutes * 60, state.settings.reflectionMinutes * 60, state.settings.presentationSeconds];
     $$('.timer-card').forEach((card, index) => { card.dataset.seconds = String(durations[index]); if (card._timer) { clearInterval(card._timer.interval); card._timer = { total: durations[index], remaining: durations[index], running: false, interval: null, endAt: 0 }; updateTimer(card); } });
   }
@@ -333,5 +355,5 @@
     if (event.key === 'ArrowLeft' || event.key === 'PageUp') { event.preventDefault(); goTo(current - 1); }
     if (event.key.toLowerCase() === 'f') $('#fullscreenBtn').click();
   });
-  $$('.timer-card').forEach(setupTimer); slides.forEach(slide => slide.classList.remove('is-active')); goTo(0);
+  $$('.timer-card').forEach(setupTimer); $$('.slide').forEach(slide => slide.classList.remove('is-active')); current = 0; goTo(0);
 })();

@@ -174,6 +174,21 @@
     renderTeams(); renderMeasurements(); renderResults(); renderPresentationTabs();
   }
 
+  function launchConfetti() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    $('#confetti-layer')?.remove();
+    const layer = document.createElement('div'); layer.id = 'confetti-layer'; layer.className = 'confetti-layer'; document.body.appendChild(layer);
+    const colors = ['#fbbc04', '#4285f4', '#34a853', '#ea4335', '#ffffff', '#ff7eb6'];
+    for (let i = 0; i < 150; i += 1) {
+      const piece = document.createElement('i'); piece.className = 'confetti-piece';
+      piece.style.left = `${Math.random() * 100}vw`; piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.animationDelay = `${Math.random() * .9}s`; piece.style.animationDuration = `${2.4 + Math.random() * 2.4}s`;
+      piece.style.width = `${7 + Math.random() * 9}px`; piece.style.height = `${10 + Math.random() * 16}px`;
+      piece.style.borderRadius = Math.random() > .55 ? '50%' : '2px'; piece.style.setProperty('--drift', `${-140 + Math.random() * 280}px`); piece.style.setProperty('--spin', `${360 + Math.random() * 1080}deg`); layer.appendChild(piece);
+    }
+    setTimeout(() => layer.remove(), 5600);
+  }
+
   function goTo(index) {
     const next = Math.max(0, Math.min(slides.length - 1, index));
     if (next === current && slides[current].classList.contains('is-active')) return;
@@ -184,6 +199,7 @@
     $('#prevBtn').disabled = current === 0; $('#nextBtn').disabled = current === slides.length - 1;
     $('#nextBtn').innerHTML = current === slides.length - 2 ? '終了へ <span>→</span>' : '次へ <span>→</span>';
     document.body.classList.toggle('prestart-active', slides[current].dataset.optional === 'prestart');
+    if (slides[current].dataset.title === 'RESULTS') launchConfetti();
     $('#stage').focus({ preventScroll: true });
   }
 
@@ -287,7 +303,7 @@
 
   function boundedNumber(value, min, max, fallback) { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback; }
   function applySettingsToApp() {
-    document.title = window.i18n?.language === 'en' ? 'Marshmallow Challenge' : 'マシュマロ・チャレンジ';
+    document.title = window.i18n?.language === 'en' ? 'Marshmallow Challenge | Team-Building Workshop App' : 'マシュマロチャレンジ｜チームビルディング研修・ワークショップ進行アプリ';
     $('#preStartMessage').innerHTML = sanitizeDisplayHtml(state.settings.preStartText);
     $('#ruleBuildMinutes').textContent = `${state.settings.buildMinutes}分。`;
     $('#challengeDurationTitle').textContent = `${state.settings.buildMinutes}分間の`;

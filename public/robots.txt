@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Sitemap: https://marshmallow-challenge-web.pages.dev/public/sitemap.xml
+

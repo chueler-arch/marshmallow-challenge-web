@@ -1,0 +1,39 @@
+Marshmallow Challenge：GitHubへのPushからCloudflare Pagesデプロイまで
+
+【通常のデプロイ】
+1. PowerShellでこのフォルダを開きます。
+   C:\Users\T308314H\GoogleApps\MarshmallowChallenge
+
+2. 変更内容を確認します。
+   git status --short
+   git diff --check
+
+3. 公開するファイルだけをステージします。
+   例：git add -- public/index.html public/css/styles.css public/js/app.js
+
+4. コミットします。
+   git commit -m "変更内容を表すメッセージ"
+
+5. mainブランチをGitHubへPushします。
+   git push origin main
+
+6. Cloudflare DashboardでWorkers & Pagesを開き、marshmallow-challenge-webを選択します。
+   Deploymentsで、Pushしたコミットに緑のチェックが付くまで待ちます。
+
+7. 本番を確認します。
+   推奨設定の場合：https://marshmallow-challenge-web.pages.dev/
+   リポジトリルートを公開している現在の設定では：https://marshmallow-challenge-web.pages.dev/public/
+   旧表示が残る場合は Ctrl + Shift + R で強制再読み込みします。
+
+【Cloudflare Pagesの推奨設定】
+- Production branch: main
+- Framework preset: None
+- Build command: 空欄
+- Build output directory: public
+
+Build output directoryをpublicへ変更すると、URL末尾の/public/なしでアプリを直接表示できます。
+
+【自動デプロイされない場合】
+Cloudflare Dashboardの対象プロジェクトでDeploymentsを開き、対象コミットのDetailsからRetry deploymentを実行します。
+GitHub連携自体が切れている場合は、SettingsのBuilds & deploymentsからGitHubリポジトリ marshmallow-challenge-web を再接続します。
+

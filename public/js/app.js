@@ -90,7 +90,8 @@
     $('#measureGrid').innerHTML = state.teams.map((team, index) => `
       <article class="measure-card" style="--team-color:${teamColor(index)}">
         <header><b>${escapeHtml(team.name)}</b><span>HEIGHT</span></header>
-        <label><input type="number" min="0" max="999" step="0.1" inputmode="decimal" value="${state.scores[index] || ''}" data-score="${index}" aria-label="${escapeHtml(team.name)}の高さ"><span>cm</span></label>
+        <label class="measure-card-hitarea" for="team-height-${index}" aria-hidden="true"></label>
+        <div class="score-entry"><input id="team-height-${index}" type="number" min="0" max="999" step="0.1" inputmode="decimal" value="${state.scores[index] || ''}" data-score="${index}" aria-label="${escapeHtml(team.name)}の高さ"><span>cm</span></div>
       </article>`).join('');
     $$('[data-score]').forEach(input => input.addEventListener('input', () => {
       state.scores[Number(input.dataset.score)] = Math.max(0, Number(input.value) || 0);
@@ -100,7 +101,6 @@
       card.tabIndex = 0;
       card.setAttribute('role', 'group');
       const focusInput = () => { const input = $('[data-score]', card); input.focus(); input.select(); };
-      card.addEventListener('click', event => { if (event.target.tagName !== 'INPUT') focusInput(); });
       card.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); focusInput(); } });
     });
   }

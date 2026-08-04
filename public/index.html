@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#fff8ec">
   <meta name="description" content="マシュマロ・チャレンジのチーム分け、タイマー、計測、振り返りを一つにまとめた進行アプリ">
   <title>マシュマロ・チャレンジ</title>
+  <link rel="icon" href="images/favicon.ico">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@500;600;700&family=Noto+Sans+JP:wght@500;600;700;800;900&display=swap" rel="stylesheet">
@@ -31,7 +32,7 @@
 
     <main id="stage" tabindex="-1" aria-live="polite">
       <section class="slide prestart-slide" data-title="READY" data-optional="prestart">
-        <p id="preStartMessage">みなさんにチャレンジ頂くのは・・・</p>
+        <div id="preStartMessage">みなさんにチャレンジ頂くのは・・・</div>
       </section>
       <section class="slide hero is-active" data-title="START">
         <div class="hero-copy">
@@ -60,6 +61,7 @@
           <div class="participant-panel">
             <label for="participantInput">参加者 <small id="participantCount">12名</small></label>
             <textarea id="participantInput" rows="8" spellcheck="false"></textarea>
+            <label class="main-team-count" for="mainTeamCount">チーム数<input id="mainTeamCount" type="number" min="1" max="20" value="1"></label>
             <button class="shuffle-btn" id="shuffleBtn" type="button"><span>↻</span> ランダムにチーム分け</button>
           </div>
           <div class="teams" id="teams" aria-live="polite"></div>
@@ -84,7 +86,6 @@
           <button type="button"><span>03</span><b>ひも</b><strong>90<small>cm</small></strong><i>✓</i></button>
           <button type="button"><span>04</span><b>マシュマロ</b><strong>1<small>つ</small></strong><i>✓</i></button>
           <button type="button"><span>05</span><b>はさみ</b><strong>1<small>つ</small></strong><i>✓</i></button>
-          <button class="shared-supply" type="button"><span>会場共通</span><b>大型モニタ または<br>プロジェクター</b><strong>1<small>台</small></strong><i>✓</i></button>
         </div>
       </section>
 
@@ -97,7 +98,7 @@
       <section class="slide rule-detail" data-title="RULE 07"><div class="rule-detail-copy"><p class="eyebrow"><span></span> RULE 07 / 07</p><h2>制限時間は、<br><em id="ruleBuildMinutes">18分。</em></h2><p>作戦タイムも制限時間に含まれます。</p></div><img src="images/explanation07.png" alt="制限時間の説明"></section>
 
       <section class="slide challenge-slide" data-title="BUILD">
-        <div class="challenge-copy"><p class="eyebrow light"><span></span> READY TO BUILD?</p><h2>18分間の<br><em>チャレンジ。</em></h2><p>使ってよいのは、確認した5つの備品だけ。<br>準備ができたらタイマーをスタート！</p></div>
+        <div class="challenge-copy"><p class="eyebrow light"><span></span> READY TO BUILD?</p><h2><span id="challengeDurationTitle">18分間の</span><br><em>チャレンジ。</em></h2><p>使ってよいのは、確認した5つの備品だけ。<br>準備ができたらタイマーをスタート！</p></div>
         <div class="timer-card timer-card--dark" data-seconds="1080">
           <p>TIME REMAINING</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">18:00</strong></div>
           <div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div>
@@ -119,7 +120,7 @@
 
       <section class="slide" data-title="REFLECTION">
         <div class="split-layout reflection-layout">
-          <div><p class="eyebrow"><span></span> REFLECTION</p><h2>つくった後が、<br><em>いちばん大事。</em></h2><div class="questions"><p><span>01</span>なぜ、この順位・高さになった？</p><p><span>02</span>どうすれば1位になれた？</p><p><span>03</span>次の挑戦で変えることは？</p></div></div>
+          <div><p class="eyebrow"><span></span> REFLECTION</p><h2>つくった後が、<br><em>いちばん大事。</em></h2><p class="reflection-intro">チームで振り返り、気づいたことを発表しましょう。</p><div class="questions"><p><span>01</span>なぜ、この順位・高さになった？</p><p><span>02</span>どうすれば1位になれた？</p><p><span>03</span>次の挑戦で変えることは？</p></div></div>
           <div class="timer-card" data-seconds="180">
             <p>TEAM TALK</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">03:00</strong></div>
             <div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div>
@@ -128,7 +129,7 @@
       </section>
 
       <section class="slide" data-title="PRESENTATION">
-        <div class="presentation-head"><div><p class="eyebrow"><span></span> PRESENTATION</p><h2>30秒で、<em>発表。</em></h2></div><div class="team-tabs" id="teamTabs"></div></div>
+        <div class="presentation-head"><div><p class="eyebrow"><span></span> PRESENTATION</p><h2><span id="presentationDurationTitle">30秒で、</span><em>発表。</em></h2></div><div class="team-tabs" id="teamTabs"></div></div>
         <div class="presentation-body"><div><span id="presentingBadge">TEAM A</span><h3 id="presentingTeam">Aチームの発表</h3><p>気づいたこと、工夫したこと、次に変えたいことを共有してください。</p></div>
           <div class="timer-card compact" data-seconds="30"><p>PRESENTATION TIME</p><div class="timer-dial"><svg viewBox="0 0 120 120"><circle class="dial-bg" cx="60" cy="60" r="54"/><circle class="dial-progress" cx="60" cy="60" r="54"/></svg><strong class="timer-display">00:30</strong></div><div class="timer-actions"><button type="button" data-timer-action="reset">↺</button><button class="timer-main" type="button" data-timer-action="toggle">スタート</button></div></div>
         </div>
@@ -202,7 +203,7 @@
               <label>チーム発表<input id="settingPresentation" type="number" min="5" max="600"><span>秒</span></label>
               <label class="toggle-label">効果音を初期状態でON<input id="settingSound" type="checkbox"><i></i></label>
               <label class="toggle-label">開始前画面を表示<input id="settingPreStart" type="checkbox"><i></i></label>
-              <label class="wide-setting">開始前画面の文字<input id="settingPreStartText" type="text" maxlength="100" placeholder="みなさんにチャレンジ頂くのは・・・"></label>
+              <label class="wide-setting">開始前画面の文字 <small>改行・HTMLタグ使用可</small><textarea id="settingPreStartText" rows="4" maxlength="1000" placeholder="みなさんにチャレンジ頂くのは・・・"></textarea></label>
               <label>1位の景品<input id="settingPrize1" type="text" maxlength="60" placeholder="未入力"></label>
               <label>2位の景品<input id="settingPrize2" type="text" maxlength="60" placeholder="未入力"></label>
               <label>3位の景品<input id="settingPrize3" type="text" maxlength="60" placeholder="未入力"></label>

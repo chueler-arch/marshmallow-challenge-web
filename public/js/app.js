@@ -69,9 +69,20 @@
     $('#teams').style.setProperty('--team-count', Math.min(state.teams.length, 4));
     $('#teams').innerHTML = state.teams.map((team, index) => `
       <article class="team-card" style="--team-color:${teamColor(index)}" data-letter="${teamLetter(index)}">
-        <header><b>${teamLetter(index)}</b><span>${escapeHtml(team.name)}</span></header>
+        <header><b>${teamLetter(index)}</b><span><button type="button" data-edit-team-name="${index}" title="クリックしてチーム名を編集">${escapeHtml(team.name)}</button><input type="text" data-team-name-editor="${index}" maxlength="30" value="${escapeHtml(team.name)}" aria-label="チーム名を編集"></span></header>
         <ul>${team.members.map(name => `<li>${escapeHtml(name)}</li>`).join('') || '<li class="empty-member">参加者未登録</li>'}</ul>
       </article>`).join('');
+    $('#mainTeamCount').value = state.teams.length;
+  }
+
+  function setTeamCount(value) {
+    const count = Math.min(20, Math.max(1, Number(value) || 1));
+    if (count === state.teams.length) return;
+    const names = allNames();
+    if (count > state.teams.length) while (state.teams.length < count) state.teams.push({ name: `チーム${state.teams.length + 1}`, members: [] });
+    else state.teams = state.teams.slice(0, count);
+    state.scores = state.teams.map((_, index) => state.scores[index] || 0);
+    distributeNames(names); saveState(); syncMainFromState(); syncSetupFields(); showToast(`${count}チームに変更しました`);
   }
 
   function renderMeasurements() {
@@ -245,8 +256,10 @@
   function boundedNumber(value, min, max, fallback) { const number = Number(value); return Number.isFinite(number) ? Math.min(max, Math.max(min, number)) : fallback; }
   function applySettingsToApp() {
     document.title = 'マシュマロ・チャレンジ';
-    $('#preStartMessage').textContent = state.settings.preStartText;
+    $('#preStartMessage').innerHTML = sanitizeDisplayHtml(state.settings.preStartText);
     $('#ruleBuildMinutes').textContent = `${state.settings.buildMinutes}分。`;
+    $('#challengeDurationTitle').textContent = `${state.settings.buildMinutes}分間の`;
+    $('#presentationDurationTitle').textContent = `${state.settings.presentationSeconds}秒で、`;
     refreshSlides();
     const durations = [state.settings.presenterSeconds, state.settings.buildMinutes * 60, state.settings.reflectionMinutes * 60, state.settings.presentationSeconds];
     $$('.timer-card').forEach((card, index) => { card.dataset.seconds = String(durations[index]); if (card._timer) { clearInterval(card._timer.interval); card._timer = { total: durations[index], remaining: durations[index], running: false, interval: null, endAt: 0 }; updateTimer(card); } });
@@ -317,9 +330,36 @@
     return rows.filter(item => item.some(value => value !== ''));
   }
 
+  function sanitizeDisplayHtml(value) {
+    const template = document.createElement('template');
+    template.innerHTML = String(value || '').replace(/\r?\n/g, '<br>');
+    const allowed = new Set(['BR', 'STRONG', 'B', 'EM', 'I', 'U', 'SPAN', 'SMALL', 'MARK', 'P', 'DIV', 'H1', 'H2', 'H3']);
+    [...template.content.querySelectorAll('*')].forEach(element => {
+      if (!allowed.has(element.tagName)) element.replaceWith(...element.childNodes);
+      else [...element.attributes].forEach(attribute => element.removeAttribute(attribute.name));
+    });
+    return template.innerHTML;
+  }
+
+  function restartExperience() {
+    $$('.timer-card').forEach(resetTimer); refreshSlides();
+    $$('.slide').forEach(slide => slide.classList.remove('is-active'));
+    current = -1; goTo(0);
+  }
+
   localStorage.removeItem('marshmallow-challenge-state-v2'); localStorage.removeItem('marshmallow-challenge-state-v3');
   applySettingsToApp(); syncMainFromState(); syncSetupFields();
   $('#participantInput').addEventListener('input', syncNames);
+  $('#mainTeamCount').addEventListener('change', event => setTeamCount(event.target.value));
+  $('#teams').addEventListener('click', event => {
+    const button = event.target.closest('[data-edit-team-name]'); if (!button) return;
+    const card = button.closest('.team-card'); card.classList.add('is-editing-name'); const input = $('[data-team-name-editor]', card); input.focus(); input.select();
+  });
+  $('#teams').addEventListener('keydown', event => { if (event.target.matches('[data-team-name-editor]') && event.key === 'Enter') { event.preventDefault(); event.target.blur(); } });
+  $('#teams').addEventListener('focusout', event => {
+    const input = event.target.closest('[data-team-name-editor]'); if (!input) return;
+    const index = Number(input.dataset.teamNameEditor); state.teams[index].name = input.value.trim() || `チーム${index + 1}`; saveState(); syncMainFromState(); syncSetupFields();
+  });
   $('#shuffleBtn').addEventListener('click', () => {
     const names = $('#participantInput').value.split(/\r?\n/).map(name => name.trim()).filter(Boolean);
     if (names.length < state.teams.length) return showToast('参加者数がチーム数より少なくなっています');
@@ -329,7 +369,7 @@
   $('#supplyGrid').addEventListener('click', event => event.target.closest('button')?.classList.toggle('is-checked'));
   $('#prevBtn').addEventListener('click', () => goTo(current - 1)); $('#nextBtn').addEventListener('click', () => goTo(current + 1));
   $$('[data-next]').forEach(button => button.addEventListener('click', () => goTo(current + 1)));
-  $('.brand').addEventListener('click', event => { event.preventDefault(); goTo(0); }); $('#restartBtn').addEventListener('click', () => goTo(0));
+  $('.brand').addEventListener('click', event => { event.preventDefault(); restartExperience(); }); $('#restartBtn').addEventListener('click', restartExperience);
   $('#soundBtn').addEventListener('click', () => { soundEnabled = !soundEnabled; state.settings.sound = soundEnabled; saveState(); $('#soundBtn').classList.toggle('is-muted', !soundEnabled); showToast(soundEnabled ? '効果音 ON' : '効果音 OFF'); });
   $('#setupBtn').addEventListener('click', () => openSetup()); $('#setupCloseBtn').addEventListener('click', closeSetup); $('#setupDoneBtn').addEventListener('click', () => { closeSetup(); showToast('事前準備を保存しました'); });
   $('#setupPrevBtn').addEventListener('click', () => showSetupPage(setupPage - 1)); $('#setupNextBtn').addEventListener('click', () => showSetupPage(setupPage + 1));
@@ -343,6 +383,7 @@
   $('#addTeamBtn').addEventListener('click', () => { saveTeamRegistration(); const index = state.teams.length; state.teams.push({ name: `チーム${index + 1}`, members: [] }); state.scores.push(0); saveState(); syncSetupFields(); syncMainFromState(); });
   $('#setupShuffleBtn').addEventListener('click', () => { saveTeamRegistration(); const names = allNames(); if (names.length < state.teams.length) return showToast('参加者数がチーム数より少なくなっています'); distributeNames(names, true); saveState(); syncSetupFields(); syncMainFromState(); playChime(); showToast(`${state.teams.length}チームに再振り分けました`); });
   $$('.setup-page input').forEach(input => input.addEventListener('change', saveSetupFields));
+  $('#settingPreStartText').addEventListener('change', saveSetupFields);
   $$('.export-config-btn').forEach(button => button.addEventListener('click', exportConfiguration));
   $$('.import-config-btn').forEach(button => button.addEventListener('click', () => $('#importConfigInput').click()));
   $('#importConfigInput').addEventListener('change', event => { const [file] = event.target.files; if (file) importConfiguration(file); event.target.value = ''; });

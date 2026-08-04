@@ -215,6 +215,7 @@
     $('.dial-progress', card).style.strokeDashoffset = `${339.292 * (1 - timer.remaining / timer.total)}`;
     $('[data-timer-action="toggle"]', card).textContent = timer.running ? '一時停止' : timer.remaining === timer.total ? 'スタート' : '再開';
     card.classList.toggle('is-urgent', timer.remaining <= 10 && timer.remaining > 0);
+    card.classList.toggle('is-running', timer.running);
   }
 
   function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showToast('タイムアップ！'); }
@@ -238,10 +239,10 @@
   function openSetup(page = 0) { syncSetupFields(); showSetupPage(page); $('#setupOverlay').classList.add('is-open'); $('#setupOverlay').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; }
   function closeSetup() { saveSetupFields(); $('#setupOverlay').classList.remove('is-open'); $('#setupOverlay').setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; $('#setupBtn').focus(); }
   function showSetupPage(page) {
-    setupPage = Math.max(0, Math.min(6, page));
+    setupPage = Math.max(0, Math.min(7, page));
     $$('[data-setup-page]').forEach((button, index) => button.classList.toggle('is-active', index === setupPage));
     $$('[data-setup-panel]').forEach((panel, index) => panel.classList.toggle('is-active', index === setupPage));
-    $('#setupPrevBtn').disabled = setupPage === 0; $('.setup-footer').classList.toggle('is-last', setupPage === 6);
+    $('#setupPrevBtn').disabled = setupPage === 0; $('.setup-footer').classList.toggle('is-last', setupPage === 7);
     if (setupPage === 2) renderMaterialTeamTable();
   }
 
@@ -352,6 +353,28 @@
     return template.innerHTML;
   }
 
+  function beginTimerEdit(card) {
+    if (!card?._timer || $('.timer-edit-input', card)) return;
+    const timer = card._timer;
+    if (timer.running) toggleTimer(card);
+    const display = $('.timer-display', card);
+    const input = document.createElement('input');
+    input.className = 'timer-edit-input'; input.type = 'text'; input.inputMode = 'numeric'; input.value = display.textContent; input.setAttribute('aria-label', '時間を分:秒で入力');
+    display.hidden = true; display.after(input); input.focus(); input.select();
+    let saved = false;
+    const save = () => {
+      if (saved) return; saved = true;
+      const match = input.value.trim().match(/^(?:(\d{1,3}):)?(\d{1,2})$/);
+      if (match) {
+        const total = Math.max(1, Math.min(359999, (Number(match[1] || 0) * 60) + Number(match[2])));
+        timer.total = total; timer.remaining = total; timer.endAt = 0; card.dataset.seconds = String(total);
+      } else showToast('「分:秒」の形式で入力してください');
+      input.remove(); display.hidden = false; updateTimer(card);
+    };
+    input.addEventListener('keydown', event => { if (event.key === 'Enter') { event.preventDefault(); save(); } if (event.key === 'Escape') { saved = true; input.remove(); display.hidden = false; } });
+    input.addEventListener('blur', save);
+  }
+
   function restartExperience() {
     $$('.timer-card').forEach(resetTimer); refreshSlides();
     $$('.slide').forEach(slide => slide.classList.remove('is-active'));
@@ -362,6 +385,7 @@
   applySettingsToApp(); syncMainFromState(); syncSetupFields();
   $('#participantInput').addEventListener('input', syncNames);
   function activateControl(control) {
+    control.classList.add('is-pressed'); setTimeout(() => control.classList.remove('is-pressed'), 220);
     if (control.matches('[data-restart]')) return restartExperience();
     const card = control.closest('.timer-card');
     if (!card?._timer) return;
@@ -381,6 +405,10 @@
     if (event.detail !== 0) return;
     const control = event.target.closest('[data-timer-action], [data-restart]');
     if (control) { event.preventDefault(); activateControl(control); }
+  });
+  document.addEventListener('click', event => {
+    const display = event.target.closest('.timer-display');
+    if (display) beginTimerEdit(display.closest('.timer-card'));
   });
   $('#mainTeamCount').addEventListener('change', event => setTeamCount(event.target.value));
   $('#teams').addEventListener('click', event => {

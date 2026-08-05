@@ -175,7 +175,6 @@
   }
 
   function launchConfetti() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     $('#confetti-layer')?.remove();
     const layer = document.createElement('div'); layer.id = 'confetti-layer'; layer.className = 'confetti-layer'; document.body.appendChild(layer);
     const colors = ['#fbbc04', '#4285f4', '#34a853', '#ea4335', '#ffffff', '#ff7eb6'];

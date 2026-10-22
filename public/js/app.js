@@ -240,7 +240,7 @@
     card.classList.toggle('is-running', timer.running);
   }
 
-  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showTimeUp(); }
+  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showTimeUp(); window.dispatchEvent(new Event('sona-game-completed')); }
 
   function showTimeUp() {
     const overlay = $('#timeupOverlay');

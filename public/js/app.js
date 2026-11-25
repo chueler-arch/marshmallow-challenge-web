@@ -212,6 +212,7 @@
     if (timer.running) { timer.remaining = Math.max(0, Math.ceil((timer.endAt - Date.now()) / 1000)); clearInterval(timer.interval); timer.interval = null; timer.running = false; }
     else {
       if (timer.remaining <= 0) timer.remaining = timer.total;
+      if (card.closest('.slide')?.dataset.title === 'BUILD' && !timer.metricsStarted) { timer.metricsStarted = true; timer.metricsCompleted = false; window.dispatchEvent(new Event('sona-game-started')); }
       timer.running = true; timer.endAt = Date.now() + timer.remaining * 1000;
       timer.interval = window.setInterval(() => tickTimer(card), 200);
     }
@@ -228,7 +229,7 @@
 
   function resetTimer(card) {
     if (!card?._timer) return;
-    clearInterval(card._timer.interval); Object.assign(card._timer, { remaining: card._timer.total, running: false, interval: null, endAt: 0 }); updateTimer(card);
+    clearInterval(card._timer.interval); Object.assign(card._timer, { remaining: card._timer.total, running: false, interval: null, endAt: 0, metricsStarted: false, metricsCompleted: false }); updateTimer(card);
   }
 
   function updateTimer(card) {
@@ -240,7 +241,7 @@
     card.classList.toggle('is-running', timer.running);
   }
 
-  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showTimeUp(); window.dispatchEvent(new Event('sona-game-completed')); }
+  function finishTimer(card) { clearInterval(card._timer.interval); card._timer.interval = null; card._timer.running = false; updateTimer(card); playChime(); showTimeUp(); if (card.closest('.slide')?.dataset.title === 'BUILD' && card._timer.metricsStarted && !card._timer.metricsCompleted) { card._timer.metricsCompleted = true; window.dispatchEvent(new Event('sona-game-completed')); } }
 
   function showTimeUp() {
     const overlay = $('#timeupOverlay');
